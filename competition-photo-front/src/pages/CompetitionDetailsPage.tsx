@@ -10,7 +10,6 @@ import {
   InputGroup,
   ProgressBar,
   Row,
-  Table,
 } from 'react-bootstrap';
 import { Camera, Search, Upload } from 'react-bootstrap-icons';
 import { useParams } from 'react-router-dom';
