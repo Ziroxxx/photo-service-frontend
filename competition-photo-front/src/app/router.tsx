@@ -18,7 +18,4 @@ export const router = createBrowserRouter(
       element: <CompetitionDetailsPage />,
     },
   ],
-  {
-    basename: '/photo-service-frontend',
-  }
 );
