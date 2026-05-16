@@ -61,9 +61,19 @@ export default function DownloadAccessPage() {
     createDefaultUserFilters(),
   );
   
+  const currentUserId = currentUser?.id;
+
+  const visibleUsers = useMemo(() => {
+    if (!currentUserId) {
+      return users;
+    }
+  
+    return users.filter((user) => user.id !== currentUserId);
+  }, [users, currentUserId]);
+  
   const filteredUsers = useMemo(
-    () => applyUserFilters(users, filters),
-    [users, filters],
+    () => applyUserFilters(visibleUsers, filters),
+    [visibleUsers, filters],
   );
 
   const canOpenPage =
@@ -318,7 +328,7 @@ export default function DownloadAccessPage() {
             </h4>
             <UserFilters
               value={filters}
-              users={users}
+              users={visibleUsers}
               filteredCount={filteredUsers.length}
               onChange={setFilters}
               onReset={() => setFilters(createDefaultUserFilters())}

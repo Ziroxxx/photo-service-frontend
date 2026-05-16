@@ -66,7 +66,16 @@ export default function AdminUsersPage() {
   const [filters, setFilters] = useState<UserFilterValues>(createDefaultUserFilters)
 
   const hasChanges = useMemo(() => Object.keys(drafts).length > 0, [drafts]);
-  const filteredUsers = useMemo(() => applyUserFilters(users, filters), [users, filters])
+
+  const visibleUsers = useMemo(() => {
+    if (!currentUser) {
+      return users;
+    }
+
+    return users.filter((user) => user.id !== currentUser.id);
+  }, [users, currentUser]);
+
+  const filteredUsers = useMemo(() => applyUserFilters(visibleUsers, filters), [users, filters])
 
   const loadUsers = async () => {
     setIsLoading(true);
@@ -190,7 +199,7 @@ export default function AdminUsersPage() {
             <>
               <UserFilters
                 value={filters}
-                users={users}
+                users={visibleUsers}
                 filteredCount={filteredUsers.length}
                 onChange={setFilters}
                 onReset={() => setFilters(createDefaultUserFilters())}
