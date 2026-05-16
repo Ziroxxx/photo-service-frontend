@@ -4,13 +4,14 @@ import AppNavbar from './AppNavbar';
 
 type Props = {
   children: ReactNode;
+  fluid?: boolean;
 };
 
-export default function PageContainer({ children }: Props) {
+export default function PageContainer({ children, fluid = false }: Props) {
   return (
     <div className="app-bg min-vh-100">
       <AppNavbar />
-      <Container className="py-5">{children}</Container>
+      <Container fluid={fluid} className="py-5">{children}</Container>
     </div>
   );
 }

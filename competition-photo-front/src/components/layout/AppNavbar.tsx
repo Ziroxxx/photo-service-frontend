@@ -1,62 +1,39 @@
-import { Container, Navbar, Nav, Button } from 'react-bootstrap';
-import { Images } from 'react-bootstrap-icons';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Container, Nav, Navbar } from 'react-bootstrap';
+import { Link, NavLink, useLocation } from 'react-router-dom';
+import { getCurrentUser, subscribeAuthChanged } from '../../app/authStorage';
+import { APP_ROUTES } from '../../shared/constants';
+import UserBurgerMenu from './UserBurgerMenu';
 
 export default function AppNavbar() {
-  const navigate = useNavigate();
   const location = useLocation();
+  const [currentUser, setCurrentUser] = useState(getCurrentUser());
 
-  const isActive = (path: string) => {
-    if (path === '/competitions') {
-      return location.pathname === '/competitions';
-    }
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    if (path === '/competition-details') {
-      return location.pathname.startsWith('/competitions/');
-    }
-    return false;
-  };
+  useEffect(() => {
+    return subscribeAuthChanged(() => {
+      setCurrentUser(getCurrentUser());
+    });
+  }, []);
+
+  useEffect(() => {
+    setCurrentUser(getCurrentUser());
+  }, [location.pathname]);
 
   return (
     <Navbar bg="white" expand="lg" className="border-bottom shadow-sm sticky-top">
       <Container>
-        <Navbar.Brand
-          className="fw-bold d-flex align-items-center gap-2 cursor-pointer"
-          onClick={() => navigate('/')}
-          style={{ cursor: 'pointer' }}
-        >
-          <span className="brand-icon">
-            <Images size={18} />
-          </span>
+        <Navbar.Brand as={Link} to={currentUser ? APP_ROUTES.competitions : APP_ROUTES.auth} className="fw-bold">
           FindMyPhoto
         </Navbar.Brand>
-
-        <Nav className="ms-auto d-flex flex-row gap-2">
-          <Button
-            variant={isActive('/') ? 'primary' : 'outline-primary'}
-            className="rounded-pill"
-            onClick={() => navigate('/')}
-          >
-            Аутентификация
-          </Button>
-
-          <Button
-            variant={isActive('/competitions') ? 'primary' : 'outline-primary'}
-            className="rounded-pill"
-            onClick={() => navigate('/competitions')}
-          >
-            Соревнования
-          </Button>
-
-          <Button
-            variant={isActive('/competition-details') ? 'primary' : 'outline-primary'}
-            className="rounded-pill"
-            onClick={() => navigate('/competitions/1')}
-          >
-            Карточка соревнования
-          </Button>
+        
+        <Nav className="ms-auto">
+          {currentUser ? (
+            <UserBurgerMenu user={currentUser} />
+          ) : (
+            <Nav.Link as={NavLink} to={APP_ROUTES.auth}>
+              Войти
+            </Nav.Link>
+          )}
         </Nav>
       </Container>
     </Navbar>
