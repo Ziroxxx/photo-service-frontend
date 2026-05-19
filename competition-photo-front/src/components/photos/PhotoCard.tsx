@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Badge, Button, Card } from 'react-bootstrap';
-import { Download, Heart, HeartFill, XLg, Trash } from 'react-bootstrap-icons';
+import { Download, Heart, HeartFill, Trash, XLg } from 'react-bootstrap-icons';
 import {
   isFavoritePhoto,
   subscribeFavoritesChanged,
@@ -26,6 +26,21 @@ function getAuthorName(photo: Photo) {
   return photo.authorFullName?.trim() || photo.authorLogin || 'Пусто';
 }
 
+function getPhotoBibValues(photo: Photo) {
+  const bibsFromList =
+    photo.bibs
+      ?.map((bib) => bib.bibValue?.trim())
+      .filter((bib): bib is string => Boolean(bib)) ?? [];
+
+  const values = bibsFromList.length > 0
+    ? bibsFromList
+    : photo.primaryBib
+      ? [photo.primaryBib]
+      : [];
+
+  return Array.from(new Set(values));
+}
+
 function formatStageDate(value?: string | null) {
   if (!value) return 'Пусто';
 
@@ -39,13 +54,7 @@ function formatStageDate(value?: string | null) {
 }
 
 function renderBibStatus(photo: Photo) {
-  if (photo.primaryBib) {
-    return (
-      <span className="small fw-semibold">
-        Стартовый номер: {photo.primaryBib}
-      </span>
-    );
-  }
+  const bibValues = getPhotoBibValues(photo);
 
   switch (photo.bibRecognitionStatus) {
     case 'pending':
@@ -66,7 +75,11 @@ function renderBibStatus(photo: Photo) {
       );
 
     case 'completed':
-      return <span className="small text-success">Номер распознан</span>;
+      return (
+        <span className="small text-success">
+          {bibValues.length > 1 ? 'Номера распознаны' : 'Номер распознан'}
+        </span>
+      );
 
     default:
       return null;
@@ -85,6 +98,9 @@ export default function PhotoCard({
   onRemoveFavorite,
 }: Props) {
   const [favorite, setFavorite] = useState(isFavoritePhoto(photo.id));
+
+  const bibValues = useMemo(() => getPhotoBibValues(photo), [photo]);
+  const bibLabel = bibValues.join(', ');
 
   useEffect(() => {
     setFavorite(isFavoritePhoto(photo.id));
@@ -161,13 +177,13 @@ export default function PhotoCard({
           </Button>
         ) : null}
 
-        {photo.primaryBib ? (
+        {bibLabel ? (
           <Badge
             bg="dark"
             pill
             className="position-absolute top-0 end-0 m-3 px-3 py-2"
           >
-            № {photo.primaryBib}
+            № {bibLabel}
           </Badge>
         ) : null}
       </div>
