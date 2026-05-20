@@ -14,6 +14,7 @@ type Props = {
   photo: Photo;
   stageName?: string;
   stageDate?: string | null;
+  stageEndDate?: string | null;
   competitionTitle?: string;
   onOpen?: (photo: Photo) => void;
   onDownload?: (photo: Photo) => void;
@@ -24,6 +25,37 @@ type Props = {
 
 function getAuthorName(photo: Photo) {
   return photo.authorFullName?.trim() || photo.authorLogin || 'Пусто';
+}
+
+function formatStageDateRange(start?: string | null, end?: string | null) {
+  if (!start && !end) {
+    return 'Пусто';
+  }
+
+  const format = (value?: string | null) => {
+    if (!value) return '';
+
+    const date = new Date(`${value}T00:00:00`);
+    if (Number.isNaN(date.getTime())) return '';
+
+    return date.toLocaleDateString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+    });
+  };
+
+  const startText = format(start);
+  const endText = format(end);
+
+  if (startText && endText) {
+    if (startText === endText) {
+      return startText;
+    }
+
+    return `${startText} — ${endText}`;
+  }
+
+  return startText || endText || 'Пусто';
 }
 
 function getPhotoBibValues(photo: Photo) {
@@ -39,18 +71,6 @@ function getPhotoBibValues(photo: Photo) {
       : [];
 
   return Array.from(new Set(values));
-}
-
-function formatStageDate(value?: string | null) {
-  if (!value) return 'Пусто';
-
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return 'Пусто';
-
-  return date.toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-  });
 }
 
 function renderBibStatus(photo: Photo) {
@@ -90,6 +110,7 @@ export default function PhotoCard({
   photo,
   stageName,
   stageDate,
+  stageEndDate,
   competitionTitle = '',
   onOpen,
   onDownload,
@@ -196,7 +217,7 @@ export default function PhotoCard({
             </div>
 
             <div className="text-secondary small">
-              {formatStageDate(stageDate ?? photo.dayDate)}
+              {formatStageDateRange(stageDate ?? photo.dayDate, stageEndDate ?? stageDate ?? photo.dayDate)}
             </div>
 
             <div className="mt-2">

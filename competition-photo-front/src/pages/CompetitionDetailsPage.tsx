@@ -580,6 +580,7 @@ export default function CompetitionDetailsPage() {
                     photo={photo}
                     stageName={stage?.name}
                     stageDate={stage?.stageDate}
+                    stageEndDate={stage?.stageEndDate}
                     competitionTitle={competition.title}
                     onOpen={(clickedPhoto) => setSelectedPhoto(clickedPhoto)}
                     onDownload={async (clickedPhoto) => {

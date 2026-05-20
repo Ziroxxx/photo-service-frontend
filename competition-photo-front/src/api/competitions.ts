@@ -22,6 +22,7 @@ export interface StageFormValues {
   name: string;
   sortOrder: number;
   stageDate: string;
+  stageEndDate: string;
   isActive: boolean;
 }
 
@@ -115,6 +116,7 @@ export async function createStage(
       name: payload.name,
       sortOrder: payload.sortOrder,
       stageDate: payload.stageDate || undefined,
+      stageEndDate: payload.stageEndDate,
       isActive: payload.isActive,
     }),
   });
@@ -134,6 +136,7 @@ export async function updateStage(
       name: payload.name,
       sortOrder: payload.sortOrder,
       stageDate: payload.stageDate || undefined,
+      stageEndDate: payload.stageEndDate,
       isActive: payload.isActive,
     }),
   });

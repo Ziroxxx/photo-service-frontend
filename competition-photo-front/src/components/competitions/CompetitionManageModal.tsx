@@ -34,6 +34,7 @@ function createDefaultStage(): StageFormValues {
     name: 'Основной этап',
     sortOrder: 0,
     stageDate: '',
+    stageEndDate: '',
     isActive: true,
   };
 }
@@ -85,6 +86,7 @@ function buildStagesFromCompetition(competition: Competition): StageFormValues[]
     name: stage.name,
     sortOrder: stage.sortOrder,
     stageDate: stage.stageDate ?? '',
+    stageEndDate: stage.stageEndDate,
     isActive: true,
   }));
 }
@@ -211,6 +213,7 @@ export default function CompetitionManageModal({
         name: `Этап ${prev.length + 1}`,
         sortOrder: prev.length,
         stageDate: '',
+        stageEndDate: '',
         isActive: true,
       },
     ]);
@@ -517,7 +520,7 @@ export default function CompetitionManageModal({
           {stages.map((stage, index) => (
             <div key={stage.id ?? `new-${index}`} className="border rounded-4 p-3">
               <Row className="g-3">
-                <Col md={5}>
+                <Col md={4}>
                   <Form.Group>
                     <RequiredLabel>Название этапа</RequiredLabel>
                     <Form.Control
@@ -543,9 +546,9 @@ export default function CompetitionManageModal({
                   </Form.Group>
                 </Col>
 
-                <Col md={4}>
+                <Col md={2}>
                   <Form.Group>
-                    <RequiredLabel>Дата этапа</RequiredLabel>
+                    <RequiredLabel>Дата начала этапа</RequiredLabel>
                     <Form.Control
                       type="date"
                       value={stage.stageDate}
@@ -554,6 +557,20 @@ export default function CompetitionManageModal({
                       disabled={isSubmitting || isDeleting}
                     />
                     <ErrorSpace message={stageErrors[index]?.stageDate} />
+                  </Form.Group>
+                </Col>
+
+                <Col md={3}>
+                  <Form.Group>
+                    <RequiredLabel>Дата окончания этапа</RequiredLabel>
+                    <Form.Control
+                      type="date"
+                      value={stage.stageEndDate}
+                      onChange={(e) => handleStageChange(index, 'stageEndDate', e.target.value)}
+                      isInvalid={Boolean(stageErrors[index]?.stageEndDate)}
+                      disabled={isSubmitting || isDeleting}
+                    />
+                    <ErrorSpace message={stageErrors[index]?.stageEndDate} />
                   </Form.Group>
                 </Col>
 

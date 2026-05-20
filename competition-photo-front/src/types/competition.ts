@@ -5,7 +5,8 @@ export interface CompetitionStage {
   competitionId: string;
   name: string;
   sortOrder: number;
-  stageDate?: string | null;
+  stageDate: string;
+  stageEndDate: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

@@ -142,6 +142,7 @@ export default function ManageCompetitionsPage() {
         name: stage.name,
         sortOrder: stage.sortOrder ?? index,
         stageDate: stage.stageDate,
+        stageEndDate: stage.stageEndDate,
         isActive: stage.isActive,
       });
     }
@@ -171,6 +172,7 @@ export default function ManageCompetitionsPage() {
         name: stage.name,
         sortOrder: stage.sortOrder,
         stageDate: stage.stageDate,
+        stageEndDate: stage.stageEndDate,
         isActive: stage.isActive,
       };
 

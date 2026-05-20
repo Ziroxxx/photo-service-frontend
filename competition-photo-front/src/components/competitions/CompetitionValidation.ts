@@ -11,6 +11,7 @@ export type CompetitionFieldErrors = {
 export type StageFieldError = {
   name?: string;
   stageDate?: string;
+  stageEndDate?: string;
 };
 
 export type CompetitionValidationResult = {
@@ -19,6 +20,30 @@ export type CompetitionValidationResult = {
   stageErrors: StageFieldError[];
   commonErrors: string[];
 };
+
+function startOfDay(date: Date) {
+  const copy = new Date(date);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+function endOfDay(date: Date) {
+  const copy = new Date(date);
+  copy.setHours(23, 59, 59, 999);
+  return copy;
+}
+
+function parseStageDate(value?: string) {
+  if (!value) return null;
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
 
 function toDateOnlyTimestamp(value: string): number | null {
   if (!value) return null;
@@ -100,8 +125,11 @@ export function validateCompetitionForm(
     }
 
     if (!stage.stageDate) {
-      stageErrors[index].stageDate = 'Укажите дату этапа';
-      continue;
+      stageErrors[index].stageDate = 'Укажите дату начала этапа';
+    }
+    
+    if (!stage.stageEndDate) {
+      stageErrors[index].stageEndDate = 'Укажите дату окончания этапа';
     }
 
     const stageDateTs = toDateOnlyTimestamp(stage.stageDate);
@@ -115,6 +143,41 @@ export function validateCompetitionForm(
       if (stageDateTs < startDateOnlyTs || stageDateTs > endDateOnlyTs) {
         stageErrors[index].stageDate =
           'Дата этапа должна находиться в диапазоне дат соревнования';
+      }
+    }
+
+    const competitionStartRaw = values.startAt ? new Date(values.startAt) : null;
+    const competitionEndRaw = values.endAt ? new Date(values.endAt) : null;
+
+    const competitionStart =
+      competitionStartRaw && !Number.isNaN(competitionStartRaw.getTime())
+        ? startOfDay(competitionStartRaw)
+        : null;
+
+    const competitionEnd =
+      competitionEndRaw && !Number.isNaN(competitionEndRaw.getTime())
+        ? endOfDay(competitionEndRaw)
+        : null;
+
+    const stageStart = parseStageDate(stage.stageDate);
+    const stageEnd = parseStageDate(stage.stageEndDate);
+
+    if (stageStart && stageEnd && stageEnd < stageStart) {
+      stageErrors[index].stageEndDate =
+        'Дата окончания этапа должна быть не раньше даты начала';
+    }
+    
+    if (competitionStart && competitionEnd && stageStart) {
+      if (stageStart < competitionStart || stageStart > competitionEnd) {
+        stageErrors[index].stageDate =
+          'Дата начала этапа должна быть в периоде соревнования';
+      }
+    }
+    
+    if (competitionStart && competitionEnd && stageEnd) {
+      if (stageEnd < competitionStart || stageEnd > competitionEnd) {
+        stageErrors[index].stageEndDate =
+          'Дата окончания этапа должна быть в периоде соревнования';
       }
     }
   }
